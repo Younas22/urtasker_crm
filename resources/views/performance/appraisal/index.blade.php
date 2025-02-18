@@ -8,14 +8,24 @@
         <h4 class="font-weight-bold mt-3">@lang('file.Performance Appraisal')</h4>
         <div id="success_alert" role="alert"></div>
         <br>
-        @if(session('message.error'))
-            <div class="alert alert-danger">{{ session('message.error') }}</div>
-        @elseif(session('message.success'))
-            <div class="alert alert-success">{{ session('message.success') }}</div>
+        @if(session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
         @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
+
 
         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#createModalForm"><i class="fa fa-plus"></i>{{__('file.Add New')}}</button>
         <button type="button" class="btn btn-danger" name="bulk_delete" id="bulk_delete"><i class="fa fa-minus-circle"></i>{{__('file.Bulk Delete')}}</button>
+        <!-- Button to trigger the modal -->
+        <button type="button" class="btn btn-info" id="setIncrementButton" data-toggle="modal" data-target="#setIncrementModal">
+            <i class="fa fa-set"></i> {{__('Set Increment')}}
+        </button>
+
+  
+        
     </div>
 
     <div class="table-responsive">
@@ -40,6 +50,7 @@
 
 
 @include('performance.appraisal.create-modal',['sectionData' => $sectionArray])
+@include('performance.appraisal.set-increment')
 @include('performance.appraisal.edit-modal')
 @include('performance.indicator.delete-modal')
 @include('performance.goal-type.delete-checkbox-confirm-modal')
@@ -50,8 +61,35 @@
 
 
 @push('scripts')
-<script type="text/javascript">
-    $(document).ready(function(){
+<script>
+
+$(document).ready(function() {
+    $('#setIncrementButton').on('click', function() {
+        $('#setIncrementModal').modal('show');
+    });
+});
+
+
+$(document).ready(function(){
+
+
+//         $('#setIncrementButton').on('click', function() {
+//     // Make an AJAX request to fetch the data
+//     $.ajax({
+//         url: "{{ route('performance.appraisal.setincrement') }}",
+//         type: "GET",
+//         success: function(data) {
+//             // Replace the modal content with the returned HTML
+//             $('#setIncrementModal').html(data);
+//             // Show the modal
+//             $('#setIncrementModal').modal('show');
+//         },
+//         error: function(xhr, status, error) {
+//             // Handle errors if any
+//             console.error("An error occurred: " + error);
+//         }
+//     });
+// });
 
         $.ajaxSetup({
             headers: {
@@ -344,6 +382,8 @@
         });
 
     });
+
+
 
 </script>
 @endpush

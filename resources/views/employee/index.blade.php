@@ -22,6 +22,12 @@
             <a class="btn btn-warning" type="button" href="{{url('staff/employees/chart')}}">
                 <i class="fa fa-bar-chart" aria-hidden="true"></i> Chart
             </a>
+            
+            @if (auth()->user()->role_users_id == 1 || auth()->user()->role_users_id == 6) 
+            <button type="button" class="btn btn-success" name="send_email" id="send_email"><i
+            class="fa fa-send"></i> Send Email </button>
+            @endif
+            
         </div>
         <div class="col-12">
             <!-- Filtering -->
@@ -111,7 +117,77 @@
         </div>
     </section>
 
+<!-- <div id="progress-container" style="display: none; margin-top: 20px;">
+    <div class="progress">
+        <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" 
+            role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        </div>
+    </div>
+    <p id="progress-text" style="text-align: center; margin-top: 5px;">0 / 0 emails sent</p>
+    <p id="estimated-time" style="text-align: center;">Estimated Time: 0 sec</p>
+</div> -->
 
+
+<!-- Send Email Modal -->
+<div id="progress-container" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="exampleModalLabel" class="modal-title">Sending...</h5>
+                <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button> -->
+            </div>
+
+            <div class="modal-body">
+                <span id="form_result"></span>
+                    <div class="row">
+                        <div class="col-md-12 form-group">
+                            <div class="progress">
+                                <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                                    role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                            <p id="progress-text" style="text-align: center; margin-top: 5px;">0 / 0 emails sent</p>
+                            <p id="estimated-time" style="text-align: center;">Estimated Time: 0 sec</p>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Send Email Modal -->
+<div id="sendModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="exampleModalLabel" class="modal-title">Send Email</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <span id="form_result"></span>
+                <form method="post" id="send_form" class="form-horizontal" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-md-12 form-group">
+                        <label>Message:</label>
+                        <textarea id="message" class="form-control" rows="7" placeholder="Type your message here"></textarea>
+                    </div>
+                    <div class="col-md-12 form-group">
+                        <label>Attach File:</label>
+                        <input type="file" id="file_attachment" class="form-control">
+                    </div>
+                </div>
+                    <button type="button" class="btn btn-primary" id="send_now">Send Now</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
     <div id="formModal" class="modal fade" role="dialog">
         <div class="modal-dialog modal-dialog-centered">
@@ -524,8 +600,95 @@
     });
 
 
-    //-------------- Filter -----------------------
+// Send Email Button Click
+$('#send_email').click(function () {
+            var id = [];
+            let table = $('#employee-table').DataTable();
+            id = table.rows({selected: true}).ids().toArray();
 
+            if (id.length === 0) {
+                alert('Select at least one user');
+            } else {
+                $('#sendModal').modal('show'); // Show modal
+            }
+        });
+
+    
+        $('#send_now').click(function () {
+    let table = $('#employee-table').DataTable();
+    let selectedUsers = table.rows({selected: true}).ids().toArray();
+    let message = $('#message').val();
+    let file = $('#file_attachment')[0].files[0]; // Get the file
+
+    if (selectedUsers.length === 0) {
+        alert('Please select at least one user.');
+        return;
+    }
+    if (message.trim() === '') {
+        alert('Please enter a message.');
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append('_token', '{{ csrf_token() }}');
+    formData.append('employeeIdArray', JSON.stringify(selectedUsers));
+    formData.append('message', message);
+
+    if (file) {
+        formData.append('file', file);
+    }
+
+    // Hide modal and show progress
+    $('#sendModal').modal('hide');
+    $('#progress-container').modal('show');
+
+    let totalUsers = selectedUsers.length;
+    let estimatedTime = totalUsers * 5; // 5 sec per user
+    let progress = 0;
+    let intervalTime = 1000;
+
+    $('#progress-bar').css('width', '0%').attr('aria-valuenow', 0);
+    $('#progress-text').text(`0 / ${totalUsers} emails sent`);
+
+    let interval = setInterval(function () {
+        progress++;
+        let percentage = Math.min((progress / estimatedTime) * 100, 100);
+        $('#progress-bar').css('width', percentage + '%').attr('aria-valuenow', percentage);
+        let emailsSent = Math.min(Math.floor(progress / 5), totalUsers);
+        $('#progress-text').text(`${emailsSent} / ${totalUsers} emails sent`);
+
+        if (progress >= estimatedTime) {
+            clearInterval(interval);
+        }
+    }, intervalTime);
+
+    $.ajax({
+        url: '{{ route("send.bulk.email") }}',
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            clearInterval(interval);
+            $('#progress-bar').css('width', '100%').attr('aria-valuenow', 100);
+            $('#progress-text').text(`Emails sent successfully`);
+
+            setTimeout(function () {
+                $('#progress-container').modal('hide'); 
+                alert(response.message);
+                location.reload();
+            }, 2000);
+        },
+        error: function () {
+            clearInterval(interval);
+            $('#progress-text').text('Error sending emails.');
+            $('#progress-container').modal('hide');
+            alert('Something went wrong.');
+        }
+    });
+});
+
+    //-------------- Filter -----------------------
     $('#filterSubmit').on("click",function(e){
         $('#employee-table').DataTable().draw(true);
     });

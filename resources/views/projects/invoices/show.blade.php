@@ -10,7 +10,7 @@
 
         <div class="card invoice_details">
             <div class="card-body" id="invoice_details">
-                <h2>{{$company->company_name ?? 'null' }}
+                <h2>{{$company->company_name}}
                     <small class="pull-right">{{trans('file.Date')}}-{{ date('d-m-Y') }}</small>
                 </h2>
                 <hr>
@@ -18,27 +18,27 @@
                 <div class="row">
                     <div class="col-sm-4 company-col"> {{trans('file.From')}}
                         <address>
-                            <strong>{{$company->company_name ?? 'null'}}</strong><br>
-                            {{$location->address1 ?? 'null'}}<br>
-                            {{$location->city ?? 'null'}}, {{$location->zip ?? 'null'}}<br>
-                            {{$location->country ?? 'null'}}<br/>
-                            Phone: {{$company->contact_no ?? 'null'}}      </address>
+                            <strong>{{$company->company_name}}</strong><br>
+                            {{$location->address1}}<br>
+                            {{$location->city}}, {{$location->zip}}<br>
+                            {{$location->country}}<br/>
+                            Phone: {{$company->contact_no}}      </address>
                     </div>
 
                     <div class="col-sm-4 client-col"> {{trans('file.To')}}
                         <address>
-                            <strong>{{$client->name ?? 'null'}}</strong><br>
-                            {{$client->company_name ?? 'null'}}<br>
+                            <strong>{{$client->name}}</strong><br>
+                            {{$client->company_name}}<br>
                             {{$client->address1 ?? ''}} {{$client->address2 ?? ''}}<br>
-                            Phone: {{$client->contact_no ?? 'null'}}<br>
+                            Phone: {{$client->contact_no}}<br>
                         </address>
                     </div>
                     <!-- /.col -->
                     <div class="col-sm-4 invoice-col"><b>{{trans('file.Invoice')}}
-                            # {{$invoice->invoice_number ?? 'null'}}</b><br>
+                            # {{$invoice->invoice_number}}</b><br>
                         <br>
-                        <b>{{trans('file.Date')}}: </b>{{$invoice->invoice_date ?? 'null'}} <br>
-                        <b>{{__('Payment Due')}}: </b> {{$invoice->invoice_due_date ?? 'null'}}<br/>
+                        <b>{{trans('file.Date')}}: </b>{{$invoice->invoice_date}} <br>
+                        <b>{{__('Payment Due')}}: </b> {{$invoice->invoice_due_date}}<br/>
                         <span class="label label-danger">
                         @if($invoice->status == 1)
                                 {{trans('file.Paid')}}
