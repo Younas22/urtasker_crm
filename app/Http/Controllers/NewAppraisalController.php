@@ -69,7 +69,11 @@ class NewAppraisalController extends Controller
             return array_values($value);
         }, array: $request['indicators']));
 
+        
 
+
+
+        
 
         // Insert data into the database
         var_dump("controller 1");
@@ -78,7 +82,31 @@ class NewAppraisalController extends Controller
         AppraisalSectionIndicator::storeIndicators(insertedIds: $sectionIdsArray,request: $request);
 
         return response()->json(['message' => 'Appraisal sections and indicators created successfully.']);
+
+        
+        
+        
     }
+
+
+    public function viewAppraisal() 
+    {
+        $sections = AppraisalSection::getSectionsByCompanyId(9);
+        
+        // Loop through each section to get indicators
+        foreach ($sections as $section) {
+            $indicators = AppraisalSectionIndicator::getIndicatorsBySectionId($section->id);
+            $section->performance_indicator = $indicators;
+        }
+        
+        // return $sections;
+        return view('settings.variables.partials.view_appraisal',["sections"=> $sections]);
+
+    }
+
+
+  
+    
 
     
 }

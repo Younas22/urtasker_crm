@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
+
 
 class Appraisal extends Model
 {
@@ -58,7 +60,7 @@ class Appraisal extends Model
             if ($existingAppraisal) {
                 // Decode existing full_result
                 $existingData = json_decode($existingAppraisal->full_result, true) ?? [];
-    
+                
                 // Check if the same section_name already exists
                 foreach ($existingData as $entry) {
                     if ($entry['section_name'] === $data['section_name']) {
@@ -74,13 +76,17 @@ class Appraisal extends Model
                 ]);
     
                 // Check if full_result has 3 elements, then update result column
-                if (count($existingData) === 3) {
+               
+                if (count($existingData) === 4) {
                     $totalPercentage = array_sum(array_column($existingData, 'percentage'));
     
                     $remarksPlusIncreExpected = ($totalPercentage > 0 && $totalPercentage <= 30) ? 5 :
                                                 (($totalPercentage > 30 && $totalPercentage <= 50) ? 4 :
                                                 (($totalPercentage > 50 && $totalPercentage <= 70) ? 3 :
                                                 (($totalPercentage > 70 && $totalPercentage <= 89) ? 2 : 1)));
+                    
+                    
+
     
                     $existingAppraisal->update([
                         'result' => $totalPercentage,
@@ -111,6 +117,22 @@ class Appraisal extends Model
     }
     
 
+
+  // In Appraisal model
+public static function getAppraisalsWithFullResultLength4()
+{
+    return self::whereNotNull('full_result')
+        ->get()
+        ->filter(function ($appraisal) {
+            try {
+                $fullResult = json_decode($appraisal->full_result, true);
+                return is_array($fullResult) && count($fullResult) === 4;
+            } catch (\Exception $e) {
+                Log::error('Error decoding full_result for appraisal ID ' . $appraisal->id);
+                return false;
+            }
+        });
+}
 
 
 }

@@ -37,7 +37,7 @@ class PromotionController extends Controller {
 					})
 					->addColumn('employee', function ($row)
 					{
-						return $row->employee->full_name;
+						return $row->employee->full_name ?? 'N/A';
 					})
 					->addColumn('action', function ($data)
 					{

@@ -87,12 +87,12 @@ class AppraisalController extends Controller
         $companies = Company::select('id','company_name')->get();
         $sectionArray=$this->getFormattedSectionData();
         $appraisalData = session('appraisal_data'); 
-        if($appraisalData!=null){
-            dd($appraisalData);
-        }
-       
 
-        return view('performance.appraisal.index', compact('companies', 'sectionArray', 'appraisalData'));
+        $recordToBeIncremented = AppraisalSubmitController::getAppraisalsWithFullResultLength4();
+        return view('performance.appraisal.index', compact('companies', 'sectionArray','recordToBeIncremented'))->with([
+            'success' => session('success'),
+            'error' => session('error')
+        ]);
 
     }
 
@@ -102,7 +102,8 @@ class AppraisalController extends Controller
         $evaluateBy = [
             1 => 'Admin',
             4 => 'Team Lead',
-            6 => 'HR' // Remove unnecessary array brackets []
+            6 => 'HR' ,
+            20 => 'Director',
         ];
     
         $sectionData = app(AppraisalSubmitController::class)->getYourSection();
@@ -241,5 +242,26 @@ class AppraisalController extends Controller
 
             return response()->json(['success' => '<p><b>Data Deleted Successfully.</b></p>']);
         }
+    }
+
+
+
+    public static function setIncrement(Request $request){
+        // Extract the IDs and increments from the request
+        $ids = $request->input('id');
+        $increments = $request->input('increment');
+
+        // Ensure both arrays have the same length
+        if (count($ids) !== count($increments)) {
+            return response()->json(['error' => 'IDs and increments count mismatch'], 400);
+        }
+
+        // Loop through the IDs and update the corresponding records
+        foreach ($ids as $index => $id) {
+            Appraisal::where('id', $id)->update([
+                'increment_granted' => $increments[$index]
+            ]);
+        }
+        return redirect(route('performance.appraisal.index'));
     }
 }

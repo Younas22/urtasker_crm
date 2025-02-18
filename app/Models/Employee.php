@@ -14,7 +14,7 @@ class Employee extends Model
 		'id','team_lead', 'first_name','last_name','staff_id','email','contact_no','date_of_birth','gender','status_id','office_shift_id','salary_id','location_id','designation_id', 'company_id', 'department_id','is_active',
 		'role_users_id','permission_role_id','joining_date','probation_period','exit_date','marital_status','address','city','state','country','zip_code','cv','skype_id','fb_id',
 		'twitter_id','linkedIn_id','blogger_id','basic_salary','payslip_type','leave_id','attendance_id','performance_id','award_id','transfer_id','resignation_id',
-		'travel_id','promotion_id','complain_id','warning_id','termination_id','attendance_type','total_leave','remaining_leave','pension_type','pension_amount'];
+		'travel_id','promotion_id','complain_id','warning_id','termination_id','attendance_type','total_leave','remaining_leave','pension_type','pension_amount','appr'];
 
 
 		public function children() {

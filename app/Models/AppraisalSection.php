@@ -10,7 +10,7 @@ class AppraisalSection extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['company_id', 'name', 'weightage'];
+    protected $fillable = ['company_id', 'name', 'weightage','evaluate_by'];
 
     public function indicators()
     {
@@ -71,7 +71,8 @@ class AppraisalSection extends Model
             $section = AppraisalSection::create([
                 'company_id' => $request->company_id,
                 'name' => $sectionName,
-                'weightage' => $request->section_weightage[$index], // Assign corresponding weightage
+                'weightage' => intval($request->roles[$index]),
+                'evaluate_by'=>intval($request->roles[$index]),
             ]);
     
             $sections[] = $section;
@@ -80,5 +81,14 @@ class AppraisalSection extends Model
     
         return $insertedIds;
     }
+
+    public static function getSectionsByCompanyId($companyId)
+    {
+        return AppraisalSection::where('company_id', $companyId)->get();
+    }
+
+
+
+   
 }
     

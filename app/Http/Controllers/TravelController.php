@@ -36,11 +36,11 @@ class TravelController extends Controller {
 					})
 					->addColumn('company', function ($row)
 					{
-						return $row->company->company_name;
+						return $row->company->company_name ?? 'N/A';
 					})
 					->addColumn('employee', function ($row)
 					{
-						return $row->employee->full_name;
+						return $row->employee->full_name ?? 'N/A';
 					})
 					->addColumn('action', function ($data)
 					{

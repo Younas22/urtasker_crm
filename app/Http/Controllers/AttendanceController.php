@@ -32,7 +32,7 @@ class AttendanceController extends Controller
 
     public function index(Request $request)
     {
-        // dd('ok');
+
         $logged_user = auth()->user();
 
         //checking if date is selected else date is current
@@ -64,17 +64,17 @@ class AttendanceController extends Controller
                             ->where('end_date', '>=', $selected_date);
                     }
                 ])
-                    ->select('id', 'company_id', 'first_name', 'last_name', 'office_shift_id');
-                    // ->where('joining_date', '<=', $selected_date)
-                    // ->where('is_active', 1)
-                    // ->whereNull('exit_date');
+                    ->select('id', 'company_id', 'first_name', 'last_name', 'office_shift_id')
+                    ->where('joining_date', '<=', $selected_date)
+                    ->where('is_active', 1)
+                    ->whereNull('exit_date');
 
                 // **Role-Based Filtering**
                 if (in_array($roleId, [1, 6])) {
                     // **Admin & Manager: Get all employees**
                     $employee = $employeeQuery->get();
                 } elseif ($roleId == 4) {
-                    // dd('ok');
+                    dd('ok');
                     // **Team Lead: Get own + employees where team_lead = logged_user->id**
                     $employee = $employeeQuery->where(function ($query) use ($logged_user) {
                         $query->where('id', $logged_user->id)
@@ -101,10 +101,10 @@ class AttendanceController extends Controller
                             ->where('end_date', '>=', $selected_date);
                     }
                 ])
-                    ->select('id', 'company_id', 'first_name', 'last_name', 'office_shift_id');
-                    // ->where('joining_date', '<=', $selected_date)
-                    // ->where('is_active', 1)
-                    // ->whereNull('exit_date');
+                    ->select('id', 'company_id', 'first_name', 'last_name', 'office_shift_id')
+                    ->where('joining_date', '<=', $selected_date)
+                    ->where('is_active', 1)
+                    ->whereNull('exit_date');
 
                 // **Role-Based Filtering**
                 if (in_array($roleId, [1, 6])) {

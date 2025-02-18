@@ -76,26 +76,24 @@ class InvoiceController extends Controller {
 
 	public function show(Invoice $invoice)
 	{
-		$invoice->load('project', 'client');
-	
-		if (auth()->user()->can('view-invoice') || $invoice->client_id == auth()->user()->id) {
-			
+		$invoice->load('project','client') ;
+
+		if (auth()->user()->can('view-invoice')||$invoice->client_id == auth()->user()->id)
+		{
 			$invoice_items = InvoiceItem::whereInvoiceId($invoice->id)->get();
 			$project = $invoice->project;
 			$client = $invoice->client;
-			$company = $project ? $project->company : null;
-			$location = $company ? $company->Location : null; // Avoid accessing Location if company is null
-	
-			if (auth()->user()->role_users_id == 3) {
-				return view('client.invoice_show', compact('invoice', 'invoice_items', 'project', 'company', 'client', 'location'));
+			$company = $project->company;
+			$location = $company->Location;
+
+			if (auth()->user()->role_users_id == 3){
+				return view('client.invoice_show', compact('invoice', 'invoice_items', 'project', 'company', 'client','location'));
 			}
-	
-			return view('projects.invoices.show', compact('invoice', 'invoice_items', 'project', 'company', 'client', 'location'));
+
+			return view('projects.invoices.show', compact('invoice', 'invoice_items', 'project', 'company', 'client','location'));
 		}
-	
 		return abort('403', __('You are not authorized'));
 	}
-	
 
 	public function edit(Invoice $invoice)
 	{

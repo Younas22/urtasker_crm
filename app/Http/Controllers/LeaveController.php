@@ -184,18 +184,18 @@ $leaveCountPending = Leave::where('status', 'pending')->count();
                         $item->notify(new LeaveNotificationToAdmin());
                     }
 
-                    //Mail
-                    // $department = Department::with('DepartmentHead:id,email')->where('id', $request->department_id)->first();
-                    // if(isset($department->DepartmentHead->email)) {
-                    //     Notification::route('mail', $department->DepartmentHead->email)
-                    //     ->notify(new EmployeeLeaveNotification(
-                    //         $leave->employee->full_name,
-                    //         $leave->total_days,
-                    //         $leave->start_date,
-                    //         $leave->end_date,
-                    //         $leave->leave_reason,
-                    //     ));
-                    // }
+                    // Mail
+                    $department = Department::with('DepartmentHead:id,email')->where('id', $request->department_id)->first();
+                    if(isset($department->DepartmentHead->email)) {
+                        Notification::route('mail', $department->DepartmentHead->email)
+                        ->notify(new EmployeeLeaveNotification(
+                            $leave->employee->full_name,
+                            $leave->total_days,
+                            $leave->start_date,
+                            $leave->end_date,
+                            $leave->leave_reason,
+                        ));
+                    }
 
                 }
             }

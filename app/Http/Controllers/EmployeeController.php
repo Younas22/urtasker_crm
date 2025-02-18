@@ -26,7 +26,10 @@ use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\ValidationException;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Mail\Message;
 use Throwable;
+
 
 class EmployeeController extends Controller
 {
@@ -148,7 +151,7 @@ class EmployeeController extends Controller
 if (in_array($loggedUser->role_users_id, [1, 6])) {
     // If role_users_id is 1 or 6, show all employees
     $employees = Employee::with(['children', 'designations', 'departments', 'user'])
-        ->where('id', 226)
+        ->where('email', 'omer.r@urtasker.com')
         ->get();
 } elseif ($loggedUser->role_users_id == 4) {
     // If role_users_id is 4, first fetch the logged-in user separately
@@ -313,6 +316,47 @@ $jsonHierarchy = json_encode($hierarchy);
             return response()->json(['success' => __('You are not authorized')]);
         }
     }
+
+    public function sendBulkEmail(Request $request)
+{
+    $request->validate([
+        'message' => 'required|string',
+        'file' => 'nullable|file|max:2048'
+    ]);
+
+    $employee_id = $request->employeeIdArray;
+    $messageContent = nl2br(e($request->message)); // Convert new lines to <br> for HTML emails
+    $file = $request->file('file');
+
+// Ensure employeeIdArray is an array
+$employee_id = is_string($request->employeeIdArray) ? json_decode($request->employeeIdArray) : $request->employeeIdArray;
+
+    $users = User::whereIn('id', $employee_id)
+                 ->where('role_users_id', '!=', 1)
+                 ->get();
+
+    $fromMail = auth()->user()->email;
+    $role = auth()->user()->RoleUser->name;
+
+    foreach ($users as $user) {
+        Mail::send([], [], function (Message $message) use ($user, $fromMail, $role, $messageContent, $file) {
+            $message->to($user->email)
+                    ->subject('New Notification')
+                    ->from('Admin@basepracticesupport.co.uk', ucfirst($role))
+                    ->html($messageContent);
+
+            if ($file) {
+                $message->attach($file->getRealPath(), [
+                    'as' => $file->getClientOriginalName(),
+                    'mime' => $file->getMimeType()
+                ]);
+            }
+        });
+    }
+
+    return response()->json(['message' => 'Emails sent successfully']);
+}
+    
 
     public function store(Request $request)
     {

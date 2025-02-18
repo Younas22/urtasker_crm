@@ -41,7 +41,7 @@ class WarningController extends Controller {
 					})
 					->addColumn('warning_to', function ($row)
 					{
-						return $row->WarningTo->full_name;
+						return $row->WarningTo->full_name ?? 'N/A';
 					})
 					->addColumn('action', function ($data)
 					{
