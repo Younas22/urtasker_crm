@@ -138,7 +138,7 @@ use Illuminate\Support\Facades\File;
 use App\Http\Controllers\NewAppraisalController;
 use  App\Http\Controllers\AppraisalSubmitController;
 
-use App\Models\Employee;
+
 
 Auth::routes(['register' => false]);
 
@@ -223,6 +223,10 @@ Route::group(['middleware' => ['XSS','checkDataTable']], function () use ($isCrm
         Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'admin']], function () {
             Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
             Route::get('/get-user-role-id', [AppraisalSubmitController::class, 'getYourSection'])->name('getUserRoleId');
+            Route::get('/viewAppraisal', [NewAppraisalController::class, 'viewAppraisal'])->name('viewAppraisal');
+            Route::get('/set-increments-for-appraisals', [AppraisalSubmitController::class, 'getAppraisalsWithFullResultLength4'])->name('performance.appraisal.setincrement');
+
+
 
         });
     }
@@ -1017,6 +1021,7 @@ Route::group(['middleware' => ['XSS','checkDataTable']], function () use ($isCrm
             Route::post('/update', [AppraisalController::class, 'update'])->name('performance.appraisal.update');
             Route::get('/delete', [AppraisalController::class, 'delete'])->name('performance.appraisal.delete');
             Route::get('/delete-checkbox', [AppraisalController::class, 'deleteCheckbox'])->name('performance.appraisal.delete.checkbox');
+       
         });
     });
 
@@ -1028,6 +1033,16 @@ Route::group(['middleware' => ['XSS','checkDataTable']], function () use ($isCrm
 // updated by the dawood
 Route::post('getNewAppraisalType', [NewAppraisalController::class, 'getNewAppraisalType'])->name('getNewAppraisalType');
 Route::post('submit-employee-appraisal', [AppraisalSubmitController::class, 'submitEmployeeAppraisal'])->name('submitEmployeeAppraisal');
+
+Route::get('/set-increments-for-appraisals', [AppraisalSubmitController::class, 'getAppraisalsWithFullResultLength4'])->name('performance.appraisal.setincrement');
+
+Route::post('/send-bulk-email', [EmployeeController::class, 'sendBulkEmail'])->name('send.bulk.email');
+
+Route::post('/set-increment', [AppraisalController::class, 'setIncrement'])->name('appraisal.set-increment');
+
+Route::get('/view-appraisal', [NewAppraisalController::class, 'viewAppraisal'])->name('view.appraisal');
+
+
 
 
 Route::get('/screen-monitoring', function () {
